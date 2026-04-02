@@ -2,14 +2,14 @@ class_name PokerGame
 ## 德州扑克游戏状态机
 ## 管理轮次、下注、结算
 
-enum Stage { PREFLOP, FLOP, TURN, RIVER, SHOWDOWN }
+enum GameStage { PREFLOP, FLOP, TURN, RIVER, SHOWDOWN }
 enum Action { FOLD, CHECK, CALL, RAISE, ALLIN, WAITING }
 
 var deck: Deck
 var evaluator: HandEvaluator
 var players: Array[Player] = []
 var community: Array[PlayingCard] = []
-var stage: Stage = Stage.PREFLOP
+var stage: GameStage = GameStage.PREFLOP
 var pot: int = 0
 var current_bet: int = 0   # 本轮最低跟注额
 var dealer_idx: int = 0
@@ -36,7 +36,7 @@ func start_new_hand():
     community.clear()
     pot = 0
     current_bet = 0
-    stage = Stage.PREFLOP
+    stage = GameStage.PREFLOP
     game_over = false
     winner_name = ""
     for p in players:
@@ -59,10 +59,10 @@ func deal_community(count: int):
 func next_stage():
     reset_bet()
     match stage:
-        Stage.PREFLOP: stage = Stage.FLOP; deal_community(3)
-        Stage.FLOP:    stage = Stage.TURN; deal_community(1)
-        Stage.TURN:    stage = Stage.RIVER; deal_community(1)
-        Stage.RIVER:   stage = Stage.SHOWDOWN
+        GameStage.PREFLOP: stage = GameStage.FLOP; deal_community(3)
+        GameStage.FLOP:    stage = GameStage.TURN; deal_community(1)
+        GameStage.TURN:    stage = GameStage.RIVER; deal_community(1)
+        GameStage.RIVER:   stage = GameStage.SHOWDOWN
 
 
 func active_players() -> Array[Player]:
