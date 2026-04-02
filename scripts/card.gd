@@ -8,7 +8,7 @@ func _init(s: int, r: int):
     suit = s
     rank = r
 
-func to_string() -> String:
+func card_str() -> String:
     var suits := ["S","H","D","C"]
     var ranks := ["","2","3","4","5","6","7","8","9","10","J","Q","K","A"]
     return ranks[rank] + suits[suit]

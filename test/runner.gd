@@ -10,7 +10,7 @@ var _failed := 0
 # ═══════════════════════════════════════════════
 #  CORE CLASSES (inline, same as scripts/)
 # ═══════════════════════════════════════════════
-class PC:
+class T_PC:
     var suit: int; var rank: int
     func _init(s: int, r: int): suit = s; rank = r
     func _to_string() -> String:
@@ -19,12 +19,12 @@ class PC:
         return ranks[rank] + suits[suit]
 
 
-class Deck:
+class T_Deck:
     var _cards: Array = []
     func _init():
         for s in range(4):
             for r in range(2, 15):
-                _cards.append(PC.new(s, r))
+                _cards.append(T_PC.new(s, r))
     func shuffle():
         var rng := RandomNumberGenerator.new()
         for i in range(_cards.size()):
@@ -39,7 +39,7 @@ class Deck:
     func remaining() -> int: return _cards.size()
 
 
-class HE:
+class T_HE:
     func evaluate(cards: Array) -> Array:
         var best := _best_five(cards)
         var rc := _rank_counts(best)
@@ -181,8 +181,8 @@ func _run_all() -> void:
 
 
 func _test_deck() -> void:
-    print("━━ Deck 测试 ━━")
-    var d := Deck.new()
+    print("━━ T_Deck 测试 ━━")
+    var d := T_Deck.new()
     _assert_eq(d.remaining(), 52, "牌堆52张")
     var seen: Array = []
     for card in d._cards:
@@ -190,7 +190,7 @@ func _test_deck() -> void:
         if key in seen: _fail("有重复牌: " + key); return
         seen.append(key)
     _pass("52张无重复")
-    var d1 := Deck.new()
+    var d1 := T_Deck.new()
     var o1: Array = d1._cards.map(func(c): return str(c.suit) + str(c.rank))
     d1.shuffle()
     var o2: Array = d1._cards.map(func(c): return str(c.suit) + str(c.rank))
@@ -198,22 +198,22 @@ func _test_deck() -> void:
     for i in range(o1.size()):
         if o1[i] != o2[i]: same = false; break
     _assert(not same, "洗牌后顺序改变")
-    var d2 := Deck.new()
+    var d2 := T_Deck.new()
     _assert_eq(d2.remaining(), 52, "新建牌52张")
     var hand: Array = d2.deal(5)
     _assert_eq(d2.remaining(), 47, "发5张剩47")
     _assert_eq(hand.size(), 5, "收到5张")
-    var d3 := Deck.new()
+    var d3 := T_Deck.new()
     d3.deal(2); d3.deal(2); d3.deal(2); d3.deal(5); d3.deal(2); d3.deal(2)
     _assert_eq(d3.remaining(), 37, "5人局剩37张")
-    var d4 := Deck.new()
+    var d4 := T_Deck.new()
     d4.deal(52)
     _assert_eq(d4.deal(1).size(), 0, "空堆不能继续发")
 
 
 func _test_hand_rank() -> void:
     print("\n━━ 手牌评估器 测试 ━━")
-    var ev := HE.new()
+    var ev := T_HE.new()
     # 基础
     _t("对A > 对K",     ev.compare(_p("AhAd"), _p("KcKd")) > 0)
     _t("对K < 对A",     ev.compare(_p("KhKd"), _p("AcAs")) < 0)
@@ -269,7 +269,7 @@ func _p(s: String) -> Array:
             var rs = s.substr(i, 1).to_upper()
             var ss = s.substr(i + 1, 1).to_upper()
             if rs in rm and ss in sm:
-                cards.append(PC.new(sm[ss], rm[rs])); i += 2
+                cards.append(T_PC.new(sm[ss], rm[rs])); i += 2
             else: i += 1
         else: break
     return cards

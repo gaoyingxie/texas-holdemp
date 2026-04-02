@@ -10,18 +10,18 @@ var _failed := 0
 #  CORE CLASSES (内联所有scripts/，保证类型一致)
 # ═══════════════════════════════════════════════════════
 
-class PC:
+class T_PC:
     var suit: int; var rank: int
     func _init(s: int, r: int): suit = s; rank = r
     func _to_string() -> String:
         return str(rank) + ["S","H","D","C"][suit]
 
 
-class Deck:
+class T_Deck:
     var _cards: Array = []
     func _init():
         for s in range(4):
-            for r in range(2, 15): _cards.append(PC.new(s, r))
+            for r in range(2, 15): _cards.append(T_PC.new(s, r))
     func shuffle():
         var rng := RandomNumberGenerator.new()
         for i in range(_cards.size()):
@@ -36,14 +36,14 @@ class Deck:
     func remaining() -> int: return _cards.size()
 
 
-class HE:
+class T_HE:
     func evaluate(cards: Array) -> Array:
-        var best := _best_five(cards)
-        var rc := _rank_counts(best)
-        var flush := _is_flush(best)
-        var si := _is_straight(best)
-        var is_str: bool = si[0]
-        var sh: int = si[1]
+        var best = _best_five(cards)
+        var rc = _rank_counts(best)
+        var flush = _is_flush(best)
+        var si = _is_straight(best)
+        var is_str: bool = si[0] as bool
+        var sh: int = si[1] as int
         if flush and is_str and sh == 14: return [9, [14]]
         if flush and is_str: return [8, [sh]]
         if _has_count(rc, 4):
@@ -196,9 +196,9 @@ class HE:
 # ═══════════════════════════════════════════════════════
 #  POKER GAME (与 scripts/poker_game.gd 完全一致)
 # ═══════════════════════════════════════════════════════
-enum GameStage { PREFLOP, FLOP, TURN, RIVER, SHOWDOWN }
+enum T_GameStage { PREFLOP, FLOP, TURN, RIVER, SHOWDOWN }
 
-class Player:
+class T_Player:
     var name: String
     var chips: int
     var hand: Array = []
@@ -218,12 +218,12 @@ class Player:
         is_all_in = false
 
 
-class PokerGame:
-    var deck: Deck
-    var evaluator: HE
+class T_PokerGame:
+    var deck: T_Deck
+    var evaluator: T_HE
     var players: Array = []
     var community: Array = []
-    var stage: GameStage = GameStage.PREFLOP
+    var stage: GameStage = T_GameStage.PREFLOP
     var pot: int = 0
     var current_bet: int = 0
     var dealer_idx: int = 0
@@ -231,21 +231,21 @@ class PokerGame:
     var winner_name: String = ""
 
     func _init():
-        deck = Deck.new(); evaluator = HE.new()
+        deck = T_Deck.new(); evaluator = T_HE.new()
 
-    func add_player(name: String, chips: int) -> Player:
-        var p := Player.new(name, chips); players.append(p); return p
+    func add_player(name: String, chips: int) -> T_Player:
+        var p := T_Player.new(name, chips); players.append(p); return p
 
     func start_new_hand():
-        deck = Deck.new(); deck.shuffle()
+        deck = T_Deck.new(); deck.shuffle()
         community.clear(); pot = 0; current_bet = 0
-        stage = GameStage.PREFLOP; game_over = false; winner_name = ""
-        for pl in players: (pl as Player).reset_g()
+        stage = T_GameStage.PREFLOP; game_over = false; winner_name = ""
+        for pl in players: (pl as T_Player).reset_g()
         dealer_idx = (dealer_idx + 1) % players.size()
         deal_hole_cards()
 
     func deal_hole_cards():
-        for pl in players: (pl as Player).hand = deck.deal(2)
+        for pl in players: (pl as T_Player).hand = deck.deal(2)
 
     func deal_community(count: int):
         for i in range(count):
@@ -254,53 +254,53 @@ class PokerGame:
     func next_stage():
         reset_bet()
         match stage:
-            GameStage.PREFLOP: stage = GameStage.FLOP; deal_community(3)
-            GameStage.FLOP:    stage = GameStage.TURN; deal_community(1)
-            GameStage.TURN:    stage = GameStage.RIVER; deal_community(1)
-            GameStage.RIVER:   stage = GameStage.SHOWDOWN
+            T_GameStage.PREFLOP: stage = T_GameStage.FLOP; deal_community(3)
+            T_GameStage.FLOP:    stage = T_GameStage.TURN; deal_community(1)
+            T_GameStage.TURN:    stage = T_GameStage.RIVER; deal_community(1)
+            T_GameStage.RIVER:   stage = T_GameStage.SHOWDOWN
 
     func active_players() -> Array:
         var active: Array = []
         for pl in players:
-            if not (pl as Player).is_folded: active.append(pl)
+            if not (pl as T_Player).is_folded: active.append(pl)
         return active
 
-    func do_fold(pl: Player): pl.is_folded = true
+    func do_fold(pl: T_Player): pl.is_folded = true
 
-    func do_call(pl: Player) -> int:
+    func do_call(pl: T_Player) -> int:
         var amt := pl.bet_amount(current_bet); pot += amt; return amt
 
-    func do_raise(pl: Player, total: int) -> int:
+    func do_raise(pl: T_Player, total: int) -> int:
         current_bet = total; var amt := pl.bet_amount(total); pot += amt; return amt
 
-    func do_all_in(pl: Player) -> int:
+    func do_all_in(pl: T_Player) -> int:
         var amt := pl.bet_amount(pl.chips)
         if amt > current_bet: current_bet = amt
         pot += amt; return amt
 
-    func do_check(pl: Player) -> int: return 0
+    func do_check(pl: T_Player) -> int: return 0
 
     func reset_bet(): current_bet = 0
 
-    func award_pot(winner: Player): winner.chips += pot; pot = 0
+    func award_pot(winner: T_Player): winner.chips += pot; pot = 0
 
-    func best_hand_of(pl: Player) -> Array:
-        return evaluator.evaluate((pl as Player).hand + community)
+    func best_hand_of(pl: T_Player) -> Array:
+        return evaluator.evaluate((pl as T_Player).hand + community)
 
-    func determine_winner() -> Player:
+    func determine_winner() -> T_Player:
         var active := active_players()
         if active.is_empty(): return null
         if active.size() == 1: return active[0]
         var best: Array = best_hand_of(active[0])
-        var winner: Player = active[0] as Player
+        var winner: T_Player = active[0] as T_Player
         for i in range(1, active.size()):
-            var sc: Array = best_hand_of(active[i] as Player)
-            if evaluator.compare(sc, best) > 0: best = sc; winner = active[i] as Player
+            var sc: Array = best_hand_of(active[i] as T_Player)
+            if evaluator.compare(sc, best) > 0: best = sc; winner = active[i] as T_Player
         return winner
 
     func resolve_showdown():
         var w := determine_winner()
-        if w != null: award_pot(w); winner_name = (w as Player).name
+        if w != null: award_pot(w); winner_name = (w as T_Player).name
         game_over = true
 
 
@@ -311,78 +311,78 @@ const SUIT_SYMBOLS := ["♠","♥","♦","♣"]
 const RANK_SYMBOLS := ["X","2","3","4","5","6","7","8","9","10","J","Q","K","A"]
 
 class UIGame:
-    var game: PokerGame
-    var player: Player
-    var ai1: Player
-    var ai2: Player
+    var game: T_PokerGame
+    var player: T_Player
+    var ai1: T_Player
+    var ai2: T_Player
     var is_game_over: bool = false
     var last_winner: String = ""
 
     func _init():
-        game = PokerGame.new()
+        game = T_PokerGame.new()
         player = game.add_player("你", 1000)
         ai1 = game.add_player("AI-1", 1000)
         ai2 = game.add_player("AI-2", 1000)
         game.start_new_hand()
         is_game_over = false
 
-    func card_text(card: PC) -> String:
+    func card_text(card: T_PC) -> String:
         if card == null: return "?"
         return RANK_SYMBOLS[card.rank] + SUIT_SYMBOLS[card.suit]
 
     func player_card_text(idx: int) -> String:
-        if idx < (player as Player).hand.size():
-            return card_text((player as Player).hand[idx] as PC)
+        if idx < (player as T_Player).hand.size():
+            return card_text((player as T_Player).hand[idx] as T_PC)
         return "?"
 
     func community_card_text(idx: int) -> String:
         if idx < game.community.size():
-            return card_text(game.community[idx] as PC)
+            return card_text(game.community[idx] as T_PC)
         return "?"
 
     func fold_action():
-        if is_game_over or (player as Player).is_folded: return
-        game.do_fold(player as Player)
+        if is_game_over or (player as T_Player).is_folded: return
+        game.do_fold(player as T_Player)
 
     func call_action():
-        if is_game_over or (player as Player).is_folded: return
-        if game.current_bet > 0: game.do_call(player as Player)
-        else: game.do_check(player as Player)
+        if is_game_over or (player as T_Player).is_folded: return
+        if game.current_bet > 0: game.do_call(player as T_Player)
+        else: game.do_check(player as T_Player)
 
     func raise_action(extra: int):
-        if is_game_over or (player as Player).is_folded: return
-        if extra > 0: game.do_raise(player as Player, game.current_bet + extra)
+        if is_game_over or (player as T_Player).is_folded: return
+        if extra > 0: game.do_raise(player as T_Player, game.current_bet + extra)
 
     func all_in_action():
-        if is_game_over or (player as Player).is_folded: return
-        game.do_all_in(player as Player)
+        if is_game_over or (player as T_Player).is_folded: return
+        game.do_all_in(player as T_Player)
 
     func stage_name() -> String:
         match game.stage:
-            GameStage.PREFLOP: return "Pre-flop"
-            GameStage.FLOP: return "Flop"
-            GameStage.TURN: return "Turn"
-            GameStage.RIVER: return "River"
-            GameStage.SHOWDOWN: return "Showdown"
+            T_GameStage.PREFLOP: return "Pre-flop"
+            T_GameStage.FLOP: return "Flop"
+            T_GameStage.TURN: return "Turn"
+            T_GameStage.RIVER: return "River"
+            T_GameStage.SHOWDOWN: return "Showdown"
         return "?"
 
     func advance_game():
-        if game.stage == GameStage.PREFLOP:
+        if game.stage == T_GameStage.PREFLOP:
             game.next_stage()
-        elif game.stage == GameStage.FLOP:
+        elif game.stage == T_GameStage.FLOP:
             game.next_stage()
-        elif game.stage == GameStage.TURN:
+        elif game.stage == T_GameStage.TURN:
             game.next_stage()
-        elif game.stage == GameStage.RIVER:
+        elif game.stage == T_GameStage.RIVER:
             game.resolve_showdown()
             is_game_over = true
             last_winner = game.winner_name
 
     func new_hand():
-        if (player as Player).chips <= 0 or (ai1 as Player).chips <= 0 and (ai2 as Player).chips <= 0:
+        if (player as T_Player).chips <= 0 or (ai1 as T_Player).chips <= 0 and (ai2 as T_Player).chips <= 0:
             player = game.add_player("你", 1000); ai1 = game.add_player("AI-1", 1000); ai2 = game.add_player("AI-2", 1000)
-        if (ai1 as Player).chips <= 0: game.players.erase(ai1)
-        if (ai2 as Player).chips <= 0: game.players.erase(ai2)
+        if (ai1 as T_Player).chips <= 0: game.players.erase(ai1)
+        if (ai2 as T_Player).chips <= 0: game.players.erase(ai2)
         game.start_new_hand(); is_game_over = false; last_winner = ""
 
 
@@ -411,21 +411,21 @@ func _run_all() -> void:
 
 func _test_ui_card_text() -> void:
     print("━━ UI卡牌文字 ━━")
-    var ui := UIGame.new()
+    var ui = UIGame.new()
     _assert(ui.card_text(null) == "?", "null返回?")
-    var c := PC.new(0, 14)  # A♠
+    var c = T_PC.new(0, 14)  # A♠
     _assert(ui.card_text(c) == "A♠", "A♠显示正确")
-    c = PC.new(1, 10)        # 10♥
+    c = T_PC.new(1, 10)        # 10♥
     _assert(ui.card_text(c) == "10♥", "10♥显示正确")
-    c = PC.new(2, 12)       # Q♦
+    c = T_PC.new(2, 12)       # Q♦
     _assert(ui.card_text(c) == "Q♦", "Q♦显示正确")
-    c = PC.new(3, 11)       # J♣
+    c = T_PC.new(3, 11)       # J♣
     _assert(ui.card_text(c) == "J♣", "J♣显示正确")
 
 
 func _test_player_hand_access() -> void:
     print("━━ 玩家手牌访问 ━━")
-    var ui := UIGame.new()
+    var ui = UIGame.new()
     _assert(ui.player_card_text(0) != "?", "第0张手牌已发")
     _assert(ui.player_card_text(1) != "?", "第1张手牌已发")
     _assert(ui.player_card_text(2) == "?", "第2张不存在")
@@ -433,7 +433,7 @@ func _test_player_hand_access() -> void:
 
 func _test_community_card_access() -> void:
     print("━━ 公共牌访问 ━━")
-    var ui := UIGame.new()
+    var ui = UIGame.new()
     _assert(ui.community_card_text(0) == "?", "初始无公共牌")
     _assert(ui.community_card_text(5) == "?", "超出范围返回?")
     # 发3张公共牌
@@ -445,110 +445,110 @@ func _test_community_card_access() -> void:
 
 func _test_fold_action() -> void:
     print("━━ Fold操作 ━━")
-    var ui := UIGame.new()
+    var ui = UIGame.new()
     ui.fold_action()
-    _assert((ui.player as Player).is_folded, "Fold后玩家已弃牌")
-    _assert(not (ui.ai1 as Player).is_folded, "其他玩家未弃牌")
+    _assert((ui.player as T_Player).is_folded, "Fold后玩家已弃牌")
+    _assert(not (ui.ai1 as T_Player).is_folded, "其他玩家未弃牌")
     _assert(ui.is_game_over == false, "Fold不直接结束游戏")
 
 
 func _test_call_action() -> void:
     print("━━ Call操作 ━━")
-    var ui := UIGame.new()
+    var ui = UIGame.new()
     ui.game.current_bet = 50
-    var before: int = (ui.player as Player).chips
+    var before: int = (ui.player as T_Player).chips
     ui.call_action()
-    _assert((ui.player as Player).chips == before - 50, "跟注扣筹码")
+    _assert((ui.player as T_Player).chips == before - 50, "跟注扣筹码")
     _assert(ui.game.pot == 50, "底池增加50")
 
     # Check
     ui.game.reset_bet()
-    before = (ui.player as Player).chips
+    before = (ui.player as T_Player).chips
     ui.call_action()
-    _assert((ui.player as Player).chips == before, "Check不扣筹码")
+    _assert((ui.player as T_Player).chips == before, "Check不扣筹码")
 
 
 func _test_raise_action() -> void:
     print("━━ Raise操作 ━━")
-    var ui := UIGame.new()
+    var ui = UIGame.new()
     ui.game.current_bet = 50
-    var before: int = (ui.player as Player).chips
+    var before: int = (ui.player as T_Player).chips
     ui.raise_action(50)  # 加50 -> 到100
-    _assert((ui.player as Player).chips == before - 100, "加注到100扣100")
+    _assert((ui.player as T_Player).chips == before - 100, "加注到100扣100")
     _assert(ui.game.current_bet == 100, "当前最低100")
 
 
 func _test_all_in_action() -> void:
     print("━━ All-In操作 ━━")
-    var ui := UIGame.new()
-    var before: int = (ui.player as Player).chips
+    var ui = UIGame.new()
+    var before: int = (ui.player as T_Player).chips
     ui.all_in_action()
-    _assert((ui.player as Player).chips == 0, "All-in后筹码归零")
-    _assert((ui.player as Player).is_all_in, "标记All-in状态")
+    _assert((ui.player as T_Player).chips == 0, "All-in后筹码归零")
+    _assert((ui.player as T_Player).is_all_in, "标记All-in状态")
     _assert(ui.game.pot == before, "底池=原筹码")
 
 
 func _test_stage_transitions() -> void:
     print("━━ 阶段切换 ━━")
-    var ui := UIGame.new()
-    _assert(ui.game.stage == GameStage.PREFLOP, "初始Pre-flop")
+    var ui = UIGame.new()
+    _assert(ui.game.stage == T_GameStage.PREFLOP, "初始Pre-flop")
     _assert(ui.stage_name() == "Pre-flop", "阶段名Pre-flop")
 
     ui.game.next_stage()
-    _assert(ui.game.stage == GameStage.FLOP, "翻牌Flop")
+    _assert(ui.game.stage == T_GameStage.FLOP, "翻牌Flop")
     _assert(ui.game.community.size() == 3, "3张公共牌")
     _assert(ui.stage_name() == "Flop", "阶段名Flop")
 
     ui.game.next_stage()
-    _assert(ui.game.stage == GameStage.TURN, "转牌Turn")
+    _assert(ui.game.stage == T_GameStage.TURN, "转牌Turn")
     _assert(ui.game.community.size() == 4, "4张公共牌")
     _assert(ui.stage_name() == "Turn", "阶段名Turn")
 
     ui.game.next_stage()
-    _assert(ui.game.stage == GameStage.RIVER, "河牌River")
+    _assert(ui.game.stage == T_GameStage.RIVER, "河牌River")
     _assert(ui.game.community.size() == 5, "5张公共牌")
     _assert(ui.stage_name() == "River", "阶段名River")
 
 
 func _test_full_hand_flow() -> void:
     print("━━ 完整手牌流程 ━━")
-    var ui := UIGame.new()
+    var ui = UIGame.new()
     # Pre-flop
-    _assert((ui.player as Player).hand.size() == 2, "每人2张底牌")
-    _assert((ui.ai1 as Player).hand.size() == 2, "AI-1底牌")
-    _assert((ui.ai2 as Player).hand.size() == 2, "AI-2底牌")
+    _assert((ui.player as T_Player).hand.size() == 2, "每人2张底牌")
+    _assert((ui.ai1 as T_Player).hand.size() == 2, "AI-1底牌")
+    _assert((ui.ai2 as T_Player).hand.size() == 2, "AI-2底牌")
     _assert(ui.game.deck.remaining() == 52 - 6, "还剩46张")
 
     # 模拟各阶段推进
     ui.game.next_stage()  # Flop
-    _assert(ui.game.stage == GameStage.FLOP, "进入Flop")
+    _assert(ui.game.stage == T_GameStage.FLOP, "进入Flop")
     ui.game.next_stage()  # Turn
-    _assert(ui.game.stage == GameStage.TURN, "进入Turn")
+    _assert(ui.game.stage == T_GameStage.TURN, "进入Turn")
     ui.game.next_stage()  # River
-    _assert(ui.game.stage == GameStage.RIVER, "进入River")
+    _assert(ui.game.stage == T_GameStage.RIVER, "进入River")
     ui.game.next_stage()  # Showdown
-    _assert(ui.game.stage == GameStage.SHOWDOWN, "进入Showdown")
+    _assert(ui.game.stage == T_GameStage.SHOWDOWN, "进入Showdown")
     _assert(ui.is_game_over, "Showdown后游戏结束")
 
 
 func _test_new_hand_resets() -> void:
     print("━━ 新手牌重置 ━━")
-    var ui := UIGame.new()
+    var ui = UIGame.new()
     ui.game.pot = 500
-    (ui.player as Player).chips = 800
+    (ui.player as T_Player).chips = 800
     ui.game.fold_action()  # 弃掉
-    _assert((ui.player as Player).is_folded, "当前手牌已Fold")
+    _assert((ui.player as T_Player).is_folded, "当前手牌已Fold")
 
     ui.new_hand()
-    _assert(not (ui.player as Player).is_folded, "新手牌重置")
-    _assert((ui.player as Player).hand.size() == 2, "重新发2张")
+    _assert(not (ui.player as T_Player).is_folded, "新手牌重置")
+    _assert((ui.player as T_Player).hand.size() == 2, "重新发2张")
     _assert(ui.game.pot == 0, "底池重置")
     _assert(ui.is_game_over == false, "游戏未结束")
 
 
 func _test_game_over_after_showdown() -> void:
     print("━━ Showdown后状态 ━━")
-    var ui := UIGame.new()
+    var ui = UIGame.new()
     # 推进到Showdown
     ui.game.next_stage()
     ui.game.next_stage()

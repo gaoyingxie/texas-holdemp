@@ -188,7 +188,7 @@ func _check_round_end() -> void:
     if active.size() <= 1:
         _end_hand_early()
         return
-    if game.stage == GameStage.SHOWDOWN:
+    if game.stage == PokerGame.GameStage.SHOWDOWN:
         return
     # 检查是否所有人都下了最低跟注额
     if _all_bet_equal():
@@ -206,7 +206,7 @@ func _all_bet_equal() -> bool:
 
 func _advance_stage() -> void:
     game.next_stage()
-    if game.stage == GameStage.SHOWDOWN:
+    if game.stage == PokerGame.GameStage.SHOWDOWN:
         game.resolve_showdown()
         is_game_over = true
         _show_result()
