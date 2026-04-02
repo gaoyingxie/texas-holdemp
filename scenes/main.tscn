@@ -1,0 +1,253 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="Script" path="res://scripts/poker_game.gd" id="2_game"]
+[ext_resource type="Script" path="res://scripts/player.gd" id="3_player"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.05, 0.15, 0.08, 1)
+
+# ── 顶栏：筹码显示 ──
+[node name="HUD" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -600.0
+offset_top = -60.0
+offset_right = -20.0
+offset_bottom = -10.0
+grow_horizontal = 2
+
+[node name="PlayerChips" type="Label" parent="HUD"]
+layout_mode = 2
+text = "你: $1000"
+theme_override_font_sizes/font_size = 22
+
+[node name="AI1Chips" type="Label" parent="HUD"]
+layout_mode = 2
+text = "  AI-1: $1000"
+
+[node name="AI2Chips" type="Label" parent="HUD"]
+layout_mode = 2
+text = "  AI-2: $1000"
+
+[node name="PotLabel" type="Label" parent="HUD"]
+layout_mode = 2
+text = "  底池: $0"
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+
+# ── 中央：公共牌区 ──
+[node name="CommunityCards" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -60.0
+offset_right = 300.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Card0" type="Panel" parent="CommunityCards"]
+custom_minimum_size = Vector2(80, 110)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="CommunityCards/Card0"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "?"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 32
+
+[node name="Card1" type="Panel" parent="CommunityCards"]
+custom_minimum_size = Vector2(80, 110)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="CommunityCards/Card1"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "?"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 32
+
+[node name="Card2" type="Panel" parent="CommunityCards"]
+custom_minimum_size = Vector2(80, 110)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="CommunityCards/Card2"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "?"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 32
+
+[node name="Card3" type="Panel" parent="CommunityCards"]
+custom_minimum_size = Vector2(80, 110)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="CommunityCards/Card3"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "?"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 32
+
+[node name="Card4" type="Panel" parent="CommunityCards"]
+custom_minimum_size = Vector2(80, 110)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="CommunityCards/Card4"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "?"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 32
+
+# ── 玩家手牌 ──
+[node name="PlayerHand" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -160.0
+offset_top = -200.0
+offset_right = 160.0
+grow_horizontal = 2
+
+[node name="HandCard0" type="Panel" parent="PlayerHand"]
+custom_minimum_size = Vector2(100, 140)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="PlayerHand/HandCard0"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "?"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 36
+
+[node name="HandCard1" type="Panel" parent="PlayerHand"]
+custom_minimum_size = Vector2(100, 140)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="PlayerHand/HandCard1"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "?"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 36
+
+# ── 操作按钮区 ──
+[node name="ActionPanel" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -200.0
+offset_top = 120.0
+offset_right = -20.0
+offset_bottom = 380.0
+grow_horizontal = 0
+
+[node name="StageLabel" type="Label" parent="ActionPanel"]
+layout_mode = 2
+text = "阶段: Pre-flop"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.8, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 18
+
+[node name="FoldBtn" type="Button" parent="ActionPanel"]
+layout_mode = 2
+text = "弃牌 (Fold)"
+theme_override_colors/font_color_pressed = Color(1, 0.3, 0.3, 1)
+
+[node name="CheckBtn" type="Button" parent="ActionPanel"]
+layout_mode = 2
+text = "过牌 (Check)"
+
+[node name="CallBtn" type="Button" parent="ActionPanel"]
+layout_mode = 2
+text = "跟注 $0"
+
+[node name="RaiseBtn" type="Button" parent="ActionPanel"]
+layout_mode = 2
+text = "加注..."
+
+[node name="AllInBtn" type="Button" parent="ActionPanel"]
+layout_mode = 2
+text = "全压 All-in"
+
+[node name="NextHandBtn" type="Button" parent="ActionPanel"]
+layout_mode = 2
+text = "开始新局"
+theme_override_colors/font_color = Color(0.3, 1, 0.3, 1)
+
+# ── 游戏结束/赢家提示 ──
+[node name="ResultLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -30.0
+offset_right = 200.0
+offset_bottom = 30.0
+grow_horizontal = 2
+grow_vertical = 2
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
+theme_override_font_sizes/font_size = 28
+visible = false

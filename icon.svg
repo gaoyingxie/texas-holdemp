@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128">
+  <rect width="128" height="128" rx="16" fill="#1a3d1a"/>
+  <text x="64" y="50" font-size="28" text-anchor="middle" fill="white" font-family="monospace">Texas</text>
+  <text x="64" y="82" font-size="20" text-anchor="middle" fill="#ffd700" font-family="monospace">Hold'em</text>
+  <text x="64" y="110" font-size="40" text-anchor="middle" fill="#cc3333" font-family="serif">♠</text>
+</svg>
