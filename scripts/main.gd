@@ -44,15 +44,15 @@ func _setup_game() -> void:
     _update_ui()
 
 
-func _card_text(card) -> String:
+func _card_text(card) -> Dictionary:
     if card == null:
-        return "?"
+        return {"text": "?", "color": Color(1, 1, 1, 1)}
     var suit_sym = SUIT_SYMBOLS[card.suit]
     var rank_sym = RANK_SYMBOLS[card.rank]
     var color = Color(1, 1, 1, 1)
     if card.suit == 1 or card.suit == 2:
         color = Color(1, 0.3, 0.3, 1)  # 红心/方块红色
-    return rank_sym + suit_sym
+    return {"text": rank_sym + suit_sym, "color": color}
 
 
 func _update_community_cards() -> void:
@@ -62,10 +62,13 @@ func _update_community_cards() -> void:
         var label = card_node.get_node("Label")
         if i < cards.size():
             var c = cards[i]
-            label.text = _card_text(c)
+            var info = _card_text(c)
+            label.text = info.text
+            label.add_theme_color_override("font_color", info.color)
             _style_card(card_node, c)
         else:
             label.text = "?"
+            label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5, 1))
             card_node.remove_theme_color_override("background_color")
             var style = StyleBoxFlat.new()
             style.bg_color = Color(0.2, 0.25, 0.2, 0.8)
@@ -93,10 +96,13 @@ func _update_player_hand() -> void:
         var label = card_node.get_node("Label")
         if i < cards.size():
             var c = cards[i]
-            label.text = _card_text(c)
+            var info = _card_text(c)
+            label.text = info.text
+            label.add_theme_color_override("font_color", info.color)
             _style_card(card_node, c)
         else:
             label.text = "?"
+            label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5, 1))
 
 
 func _update_ui() -> void:
