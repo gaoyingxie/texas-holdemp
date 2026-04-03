@@ -1,9 +1,13 @@
+# 预加载 PlayingCard（解决类型解析顺序问题）
 class_name Player
+
+const _CardRef = preload("res://scripts/card.gd")
+
 ## 玩家/AI 基类
 
 var name: String
 var chips: int
-var hand: Array[PlayingCard] = []
+var hand = []
 var is_folded: bool = false
 var is_all_in: bool = false
 

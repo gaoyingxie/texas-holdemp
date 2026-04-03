@@ -4,10 +4,18 @@ extends Control
 const SUIT_SYMBOLS := ["♠", "♥", "♦", "♣"]
 const RANK_SYMBOLS := ["", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
 
-var game: PokerGame
-var player: Player
-var ai1: Player
-var ai2: Player
+# 预加载依赖（解决Godot 4类型解析顺序问题）
+
+
+# 预加载依赖（解决Godot 4 class_name类型作为标识符的解析顺序问题）
+const _PGR = preload("res://scripts/poker_game.gd")
+const _CR = preload("res://scripts/card.gd")
+const _PR = preload("res://scripts/player.gd")
+
+var game
+var player
+var ai1
+var ai2
 var is_game_over: bool = false
 
 
@@ -25,7 +33,7 @@ func _ready() -> void:
 
 
 func _setup_game() -> void:
-    game = PokerGame.new()
+    game = _PGR.new()
     player = game.add_player("你", 1000)
     ai1 = game.add_player("AI-1", 1000)
     ai2 = game.add_player("AI-2", 1000)
@@ -36,7 +44,7 @@ func _setup_game() -> void:
     _update_ui()
 
 
-func _card_text(card: PlayingCard) -> String:
+func _card_text(card) -> String:
     if card == null:
         return "?"
     var suit_sym = SUIT_SYMBOLS[card.suit]
@@ -48,12 +56,12 @@ func _card_text(card: PlayingCard) -> String:
 
 
 func _update_community_cards() -> void:
-    var cards := game.community
+    var cards = game.community
     for i in range(5):
         var card_node = $CommunityCards.get_child(i)
         var label = card_node.get_node("Label")
         if i < cards.size():
-            var c: PlayingCard = cards[i]
+            var c = cards[i]
             label.text = _card_text(c)
             _style_card(card_node, c)
         else:
@@ -65,7 +73,7 @@ func _update_community_cards() -> void:
             card_node.add_theme_stylebox_override("panel", style)
 
 
-func _style_card(card_node: Panel, card: PlayingCard) -> void:
+func _style_card(card_node: Panel, card) -> void:
     var style = StyleBoxFlat.new()
     style.bg_color = Color(1, 1, 1, 1)
     style.set_border_radius_all(4)
@@ -78,7 +86,7 @@ func _update_player_hand() -> void:
         var card_node = $PlayerHand.get_child(i)
         var label = card_node.get_node("Label")
         if i < cards.size():
-            var c: PlayingCard = cards[i]
+            var c = cards[i]
             label.text = _card_text(c)
             _style_card(card_node, c)
         else:
@@ -93,7 +101,7 @@ func _update_ui() -> void:
     $HUD/PotLabel.text = "  底池: $%d" % game.pot
 
     # 阶段
-    var stage_names := ["Pre-flop", "Flop", "Turn", "River", "Showdown"]
+    var stage_names = ["Pre-flop", "Flop", "Turn", "River", "Showdown"]
     $ActionPanel/StageLabel.text = "阶段: " + stage_names[game.stage]
 
     # 公共牌
@@ -103,7 +111,7 @@ func _update_ui() -> void:
     _update_player_hand()
 
     # 按钮状态
-    var is_my_turn := not player.is_folded and not is_game_over
+    var is_my_turn = not player.is_folded and not is_game_over
     $ActionPanel/FoldBtn.disabled = not is_my_turn
     $ActionPanel/CheckBtn.disabled = not is_my_turn
     $ActionPanel/CallBtn.disabled = not is_my_turn
@@ -141,7 +149,7 @@ func _on_call() -> void:
 func _on_raise() -> void:
     if is_game_over or player.is_folded: return
     # 简化：加注到 current_bet + 50
-    var raise_to := game.current_bet + 50
+    var raise_to = game.current_bet + 50
     if raise_to > player.chips:
         raise_to = player.chips
     if raise_to > 0:
@@ -165,9 +173,9 @@ func _ai_turn() -> void:
     _check_round_end()
 
 
-func _ai_action(p: Player) -> void:
-    var rng := RandomNumberGenerator.new()
-    var roll := rng.randf()
+func _ai_action(p) -> void:
+    var rng = RandomNumberGenerator.new()
+    var roll = rng.randf()
     if roll < 0.15:
         game.do_fold(p)
     elif roll < 0.4:
@@ -184,11 +192,11 @@ func _ai_action(p: Player) -> void:
 
 
 func _check_round_end() -> void:
-    var active := game.active_players()
+    var active = game.active_players()
     if active.size() <= 1:
         _end_hand_early()
         return
-    if game.stage == PokerGame.GameStage.SHOWDOWN:
+    if game.stage == _PGR.GameStage.SHOWDOWN:
         return
     # 检查是否所有人都下了最低跟注额
     if _all_bet_equal():
@@ -196,7 +204,7 @@ func _check_round_end() -> void:
 
 
 func _all_bet_equal() -> bool:
-    var active := game.active_players()
+    var active = game.active_players()
     if active.size() <= 1: return true
     for p in active:
         if p.is_all_in: continue
@@ -206,7 +214,7 @@ func _all_bet_equal() -> bool:
 
 func _advance_stage() -> void:
     game.next_stage()
-    if game.stage == PokerGame.GameStage.SHOWDOWN:
+    if game.stage == _PGR.GameStage.SHOWDOWN:
         game.resolve_showdown()
         is_game_over = true
         _show_result()
@@ -214,9 +222,9 @@ func _advance_stage() -> void:
 
 
 func _end_hand_early() -> void:
-    var active := game.active_players()
+    var active = game.active_players()
     if active.is_empty(): return
-    var winner: Player = active[0]
+    var winner = active[0]
     game.award_pot(winner)
     game.winner_name = winner.name
     is_game_over = true

@@ -1,12 +1,16 @@
+# 预加载 PlayingCard（解决类型解析顺序问题）
 class_name HandEvaluator
+
+const _CardRef = preload("res://scripts/card.gd")
+
 ## 德州扑克手牌评估器
 ## evaluate(cards) 返回 [hand_rank, kickers]
 ## hand_rank: 9=皇家同花顺,8=同花顺,7=四条,6=葫芦,5=同花,4=顺子,3=三条,2=两对,1=一对,0=高牌
 
-func evaluate(cards: Array[PlayingCard]) -> Array:
-    var best := _best_five(cards)
+func evaluate(cards) -> Array:
+    var best = _best_five(cards)
     var rc: Dictionary = _rank_counts(best)
-    var flush := _is_flush(best)
+    var flush = _is_flush(best)
     var si: Array = _is_straight(best)
     var is_straight: bool = si[0]
     var straight_high: int = si[1]
@@ -54,29 +58,29 @@ func evaluate(cards: Array[PlayingCard]) -> Array:
 
 
 ## 7张选5张最优
-func best_five(cards: Array[PlayingCard]) -> Array[PlayingCard]:
+func best_five(cards) -> Variant:
     return _best_five(cards)
 
 
 ## 比较两手牌，返回 1=hand1赢，-1=hand2赢，0=平局
-func compare(hand1: Array[PlayingCard], hand2: Array[PlayingCard]) -> int:
+func compare(hand1: Array, hand2: Array) -> int:
     var s1: Array = evaluate(hand1)
     var s2: Array = evaluate(hand2)
     return _cmp(s1, s2)
 
 
-func _best_five(cards: Array[PlayingCard]) -> Array[PlayingCard]:
+func _best_five(cards) -> Variant:
     if cards.size() <= 5:
         return cards.duplicate()
     var best_score: Array = []
-    var best_hand: Array[PlayingCard] = []
-    var n := cards.size()
+    var best_hand = []
+    var n = cards.size()
     for i in range(n - 4):
         for j in range(i + 1, n - 3):
             for k in range(j + 1, n - 2):
                 for l in range(k + 1, n - 1):
                     for m in range(l + 1, n):
-                        var combo: Array[PlayingCard] = [cards[i], cards[j], cards[k], cards[l], cards[m]]
+                        var combo = [cards[i], cards[j], cards[k], cards[l], cards[m]]
                         var score: Array = evaluate(combo)
                         if best_score.is_empty() or _cmp(score, best_score) > 0:
                             best_score = score
@@ -95,7 +99,7 @@ func _cmp(a: Array, b: Array) -> int:
     return 0
 
 
-func _rank_counts(cards: Array[PlayingCard]) -> Dictionary:
+func _rank_counts(cards) -> Dictionary:
     var counts: Dictionary = {}
     for c in cards:
         counts[c.rank] = counts.get(c.rank, 0) + 1
@@ -110,14 +114,14 @@ func _has_count(rc: Dictionary, target: int) -> bool:
 
 
 func _count_values_equal(rc: Dictionary, target: int) -> int:
-    var cnt := 0
+    var cnt = 0
     for v in rc.values():
         if v == target:
             cnt += 1
     return cnt
 
 
-func _is_flush(cards: Array[PlayingCard]) -> bool:
+func _is_flush(cards) -> bool:
     if cards.size() < 5:
         return false
     var s: int = cards[0].suit
@@ -127,7 +131,7 @@ func _is_flush(cards: Array[PlayingCard]) -> bool:
     return true
 
 
-func _is_straight(cards: Array[PlayingCard]) -> Array:
+func _is_straight(cards) -> Array:
     var ranks: Array = []
     for c in cards:
         ranks.append(c.rank)
@@ -188,7 +192,7 @@ func _top_kickers(rc: Dictionary, exclude: Array, n: int) -> Array:
     return all_ranks.slice(0, n)
 
 
-func _sorted_ranks(cards: Array[PlayingCard]) -> Array:
+func _sorted_ranks(cards) -> Array:
     var ranks: Array = []
     for c in cards:
         ranks.append(c.rank)
