@@ -73,7 +73,7 @@ custom_minimum_size = Vector2(80, 110)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="CommunityCards/Card0"]
+[node name="CommunityCards/Card0/Label" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -88,7 +88,7 @@ custom_minimum_size = Vector2(80, 110)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="CommunityCards/Card1"]
+[node name="CommunityCards/Card1/Label" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -103,7 +103,7 @@ custom_minimum_size = Vector2(80, 110)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="CommunityCards/Card2"]
+[node name="CommunityCards/Card2/Label" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -118,7 +118,7 @@ custom_minimum_size = Vector2(80, 110)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="CommunityCards/Card3"]
+[node name="CommunityCards/Card3/Label" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -133,7 +133,7 @@ custom_minimum_size = Vector2(80, 110)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="CommunityCards/Card4"]
+[node name="CommunityCards/Card4/Label" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -161,7 +161,7 @@ custom_minimum_size = Vector2(100, 140)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="PlayerHand/HandCard0"]
+[node name="PlayerHand/HandCard0/Label" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -176,7 +176,7 @@ custom_minimum_size = Vector2(100, 140)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="PlayerHand/HandCard1"]
+[node name="PlayerHand/HandCard1/Label" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
