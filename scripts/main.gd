@@ -64,11 +64,11 @@ func _update_community_cards() -> void:
             var c = cards[i]
             var info = _card_text(c)
             label.text = info.text
-            label.add_theme_color_override("font_color", info.color)
+            label.set("theme_override_colors/font_color", info.color)
             _style_card(card_node, c)
         else:
             label.text = "?"
-            label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5, 1))
+            label.set("theme_override_colors/font_color", Color(0.5, 0.5, 0.5, 1))
             card_node.remove_theme_color_override("background_color")
             var style = StyleBoxFlat.new()
             style.bg_color = Color(0.2, 0.25, 0.2, 0.8)
@@ -98,11 +98,11 @@ func _update_player_hand() -> void:
             var c = cards[i]
             var info = _card_text(c)
             label.text = info.text
-            label.add_theme_color_override("font_color", info.color)
+            label.set("theme_override_colors/font_color", info.color)
             _style_card(card_node, c)
         else:
             label.text = "?"
-            label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5, 1))
+            label.set("theme_override_colors/font_color", Color(0.5, 0.5, 0.5, 1))
 
 
 func _update_ui() -> void:
