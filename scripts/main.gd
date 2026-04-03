@@ -81,11 +81,13 @@ func _update_community_cards() -> void:
 
 
 func _style_card(card_node: Panel, card, face_up: bool) -> void:
+	card_node.custom_minimum_size = Vector2(80, 110)
 	var style = StyleBoxFlat.new()
 	if face_up:
-		style.bg_color = Color(1, 1, 1, 1)  # 白底
+		style.bg_color = Color(1, 1, 1, 1)
 	else:
-		style.bg_color = Color(0.15, 0.35, 0.65, 1)  # 深蓝卡背
+		style.bg_color = Color(0.15, 0.35, 0.65, 1)
+	style.set_content_margin_all(4)
 	style.corner_radius_top_left = 6
 	style.corner_radius_top_right = 6
 	style.corner_radius_bottom_right = 6
