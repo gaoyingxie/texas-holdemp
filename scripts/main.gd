@@ -2,7 +2,7 @@ extends Control
 ## 德州扑克主界面
 
 const SUIT_SYMBOLS := ["♠", "♥", "♦", "♣"]
-const RANK_SYMBOLS := ["", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
+const RANK_SYMBOLS := ["?", "?", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
 
 # 预加载依赖（解决Godot 4类型解析顺序问题）
 
@@ -69,14 +69,20 @@ func _update_community_cards() -> void:
             card_node.remove_theme_color_override("background_color")
             var style = StyleBoxFlat.new()
             style.bg_color = Color(0.2, 0.25, 0.2, 0.8)
-            style.set_border_radius_all(4)
+            style.corner_radius_top_left = 4
+            style.corner_radius_top_right = 4
+            style.corner_radius_bottom_right = 4
+            style.corner_radius_bottom_left = 4
             card_node.add_theme_stylebox_override("panel", style)
 
 
 func _style_card(card_node: Panel, card) -> void:
     var style = StyleBoxFlat.new()
     style.bg_color = Color(1, 1, 1, 1)
-    style.set_border_radius_all(4)
+    style.corner_radius_top_left = 4
+    style.corner_radius_top_right = 4
+    style.corner_radius_bottom_right = 4
+    style.corner_radius_bottom_left = 4
     card_node.add_theme_stylebox_override("panel", style)
 
 
