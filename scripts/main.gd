@@ -67,27 +67,25 @@ func _update_community_cards() -> void:
             var info = _card_text(c)
             label.text = info.text
             label.modulate = info.color
-            _style_card(card_node, c)
+            _style_card(card_node, c, true)
         else:
-            label.text = "?"
+            label.text = ""
             label.modulate = Color(0.5, 0.5, 0.5, 1)
-            card_node.remove_theme_color_override("background_color")
-            var style = StyleBoxFlat.new()
-            style.bg_color = Color(0.2, 0.25, 0.2, 0.8)
-            style.corner_radius_top_left = 4
-            style.corner_radius_top_right = 4
-            style.corner_radius_bottom_right = 4
-            style.corner_radius_bottom_left = 4
-            card_node.add_theme_stylebox_override("panel", style)
+            var empty_style = StyleBoxFlat.new()
+            empty_style.bg_color = Color(0, 0, 0, 0)
+            card_node.add_theme_stylebox_override("panel", empty_style)
 
 
-func _style_card(card_node: Panel, card) -> void:
+func _style_card(card_node: Panel, card, face_up: bool) -> void:
     var style = StyleBoxFlat.new()
-    style.bg_color = Color(1, 1, 1, 1)
-    style.corner_radius_top_left = 4
-    style.corner_radius_top_right = 4
-    style.corner_radius_bottom_right = 4
-    style.corner_radius_bottom_left = 4
+    if face_up:
+        style.bg_color = Color(1, 1, 1, 1)  # 白底
+    else:
+        style.bg_color = Color(0.15, 0.35, 0.65, 1)  # 深蓝卡背
+    style.corner_radius_top_left = 6
+    style.corner_radius_top_right = 6
+    style.corner_radius_bottom_right = 6
+    style.corner_radius_bottom_left = 6
     card_node.add_theme_stylebox_override("panel", style)
 
 
@@ -101,7 +99,7 @@ func _update_player_hand() -> void:
             var info = _card_text(c)
             label.text = info.text
             label.modulate = info.color
-            _style_card(card_node, c)
+            _style_card(card_node, c, true)
         else:
             label.text = "?"
             label.modulate = Color(0.5, 0.5, 0.5, 1)
@@ -120,10 +118,11 @@ func _update_ai_hands() -> void:
             var info = _card_text(c)
             label.text = info.text
             label.modulate = info.color
-            _style_card(card_node, c)
+            _style_card(card_node, c, true)
         else:
             label.text = "?"
-            label.modulate = Color(0.5, 0.5, 0.5, 1)
+            label.modulate = Color(0.7, 0.7, 0.7, 1)
+            _style_card(card_node, null, false)
 
     # Update AI-2 hand display
     var ai2_hand_nodes = $AI2Hand.get_children()
@@ -135,10 +134,11 @@ func _update_ai_hands() -> void:
             var info = _card_text(c)
             label.text = info.text
             label.modulate = info.color
-            _style_card(card_node, c)
+            _style_card(card_node, c, true)
         else:
             label.text = "?"
-            label.modulate = Color(0.5, 0.5, 0.5, 1)
+            label.modulate = Color(0.7, 0.7, 0.7, 1)
+            _style_card(card_node, null, false)
 
 
 func _show_all_hands() -> void:
@@ -242,10 +242,7 @@ func _ai_turn() -> void:
         if p.is_folded or is_game_over: continue
         await get_tree().create_timer(0.6).timeout
         _ai_action(p)
-        _update_ui()
-        # 每步行动后检查是否结束本轮
-        if _should_end_round():
-            break
+    _update_ui()
     _check_round_end()
 
 
@@ -274,19 +271,8 @@ func _check_round_end() -> void:
         return
     if game.stage == _PGR.GameStage.SHOWDOWN:
         return
-    if _should_end_round():
+    if _all_bet_equal():
         _advance_stage()
-
-
-func _should_end_round() -> bool:
-    # ALL IN 或所有活跃玩家都已下注相等（简化：只剩all-in玩家时结束）
-    var active = game.active_players()
-    var has_non_all_in = false
-    for p in active:
-        if not p.is_all_in and not p.is_folded:
-            has_non_all_in = true
-            break
-    return not has_non_all_in  # 没有还需要行动的玩家就结束
 
 
 func _all_bet_equal() -> bool:
