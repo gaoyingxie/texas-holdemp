@@ -49,7 +49,7 @@ func _card_text(card) -> Dictionary:
         return {"text": "?", "color": Color(1, 1, 1, 1)}
     var suit_sym = SUIT_SYMBOLS[card.suit]
     var rank_sym = RANK_SYMBOLS[card.rank]
-    var color = Color(1, 1, 1, 1)
+    var color = Color(0.1, 0.1, 0.1, 1)  # 黑桃/梅花黑色
     if card.suit == 1 or card.suit == 2:
         color = Color(1, 0.3, 0.3, 1)  # 红心/方块红色
     return {"text": rank_sym + suit_sym, "color": color}
