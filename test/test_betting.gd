@@ -367,7 +367,6 @@ func _test_blind_and_dealing() -> void:
     g.add_player("Alice", 1000)
     g.add_player("Bob", 1000)
     g.start_new_hand()
-    g.deal_hole_cards()
     var alice = g.players[0] as T_Player
     _assert_eq(alice.hand.size(), 2, "Alice拿2张")
     _assert_eq(g._deck.remaining(), 48, "牌堆剩48张")
@@ -379,7 +378,6 @@ func _test_fold() -> void:
     var alice = g.add_player("Alice", 1000) as T_Player
     var bob = g.add_player("Bob", 1000) as T_Player
     g.start_new_hand()
-    g.deal_hole_cards()
     g.do_fold(alice)
     _assert(alice.is_folded, "Alice已Fold")
     _assert(not bob.is_folded, "Bob未Fold")
@@ -445,7 +443,6 @@ func _test_stages() -> void:
     g.add_player("Bob", 1000)
     g.start_new_hand()
     _assert(g.stage == T_GameStage.PREFLOP, "初始Pre-flop")
-    g.deal_hole_cards()
     g.next_stage()
     _assert(g.stage == T_GameStage.FLOP, "翻牌Flop")
     _assert_eq(g.community.size(), 3, "3张公共牌")

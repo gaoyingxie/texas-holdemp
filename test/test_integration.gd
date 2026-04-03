@@ -223,7 +223,7 @@ class T_PokerGame:
     var evaluator: T_HE
     var players: Array = []
     var community: Array = []
-    var stage: GameStage = T_GameStage.PREFLOP
+    var stage = T_GameStage.PREFLOP
     var pot: int = 0
     var current_bet: int = 0
     var dealer_idx: int = 0
@@ -308,7 +308,7 @@ class T_PokerGame:
 #  UI CONTROLLER MOCK (模拟 main.gd 的逻辑)
 # ═══════════════════════════════════════════════════════
 const SUIT_SYMBOLS := ["♠","♥","♦","♣"]
-const RANK_SYMBOLS := ["X","2","3","4","5","6","7","8","9","10","J","Q","K","A"]
+const RANK_SYMBOLS := ["","","2","3","4","5","6","7","8","9","10","J","Q","K","A"]
 
 class UIGame:
     var game: T_PokerGame
@@ -367,6 +367,7 @@ class UIGame:
         return "?"
 
     func advance_game():
+        print("DEBUG advance_game: before stage=", game.stage)
         if game.stage == T_GameStage.PREFLOP:
             game.next_stage()
         elif game.stage == T_GameStage.FLOP:
@@ -374,9 +375,11 @@ class UIGame:
         elif game.stage == T_GameStage.TURN:
             game.next_stage()
         elif game.stage == T_GameStage.RIVER:
+            game.next_stage()
             game.resolve_showdown()
             is_game_over = true
             last_winner = game.winner_name
+        print("DEBUG advance_game: after stage=", game.stage, " is_game_over=", is_game_over)
 
     func new_hand():
         if (player as T_Player).chips <= 0 or (ai1 as T_Player).chips <= 0 and (ai2 as T_Player).chips <= 0:
@@ -520,13 +523,13 @@ func _test_full_hand_flow() -> void:
     _assert(ui.game.deck.remaining() == 52 - 6, "还剩46张")
 
     # 模拟各阶段推进
-    ui.game.next_stage()  # Flop
+    ui.advance_game()  # FLOP
     _assert(ui.game.stage == T_GameStage.FLOP, "进入Flop")
-    ui.game.next_stage()  # Turn
+    ui.advance_game()  # TURN
     _assert(ui.game.stage == T_GameStage.TURN, "进入Turn")
-    ui.game.next_stage()  # River
+    ui.advance_game()  # RIVER
     _assert(ui.game.stage == T_GameStage.RIVER, "进入River")
-    ui.game.next_stage()  # Showdown
+    ui.advance_game()  # SHOWDOWN + resolve
     _assert(ui.game.stage == T_GameStage.SHOWDOWN, "进入Showdown")
     _assert(ui.is_game_over, "Showdown后游戏结束")
 
@@ -549,11 +552,11 @@ func _test_new_hand_resets() -> void:
 func _test_game_over_after_showdown() -> void:
     print("━━ Showdown后状态 ━━")
     var ui = UIGame.new()
-    # 推进到Showdown
-    ui.game.next_stage()
-    ui.game.next_stage()
-    ui.game.next_stage()
-    ui.game.next_stage()
+    # 推进到Showdown（使用UI方法，它会调用resolve_showdown）
+    ui.advance_game()  # PREFLOP -> FLOP
+    ui.advance_game()  # FLOP -> TURN
+    ui.advance_game()  # TURN -> RIVER
+    ui.advance_game()  # RIVER -> SHOWDOWN + resolve
     _assert(ui.is_game_over == true, "Showdown后游戏结束")
     _assert(ui.last_winner != "", "有赢家")
     _assert(ui.game.winner_name != "", "游戏记录赢家名字")
