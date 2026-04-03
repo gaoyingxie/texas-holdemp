@@ -72,7 +72,11 @@ func _update_community_cards() -> void:
 			label.text = ""
 			label.modulate = Color(0.5, 0.5, 0.5, 1)
 			var empty_style = StyleBoxFlat.new()
-			empty_style.bg_color = Color(0, 0, 0, 0)
+			empty_style.bg_color = Color(1, 1, 1, 1)
+			empty_style.corner_radius_top_left = 6
+			empty_style.corner_radius_top_right = 6
+			empty_style.corner_radius_bottom_right = 6
+			empty_style.corner_radius_bottom_left = 6
 			card_node.add_theme_stylebox_override("panel", empty_style)
 
 
