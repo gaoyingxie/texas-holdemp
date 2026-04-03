@@ -16,7 +16,7 @@ var deck
 var evaluator
 var players = []
 var community = []
-var stage: GameStage = GameStage.PREFLOP
+var stage = GameStage.PREFLOP
 var pot: int = 0
 var current_bet: int = 0   # 本轮最低跟注额
 var dealer_idx: int = 0
