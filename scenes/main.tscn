@@ -5,15 +5,29 @@
 [ext_resource type="Script" path="res://scripts/player.gd" id="3_player"]
 
 [node name="Main" type="Control"]
+layout_mode = 2
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -640.0
+offset_top = -360.0
+offset_right = 640.0
+offset_bottom = 360.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_main")
 
 [node name="Background" type="ColorRect" parent="."]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color(0.05, 0.15, 0.08, 1)
 
 [node name="HUD" type="HBoxContainer" parent="."]
+layout_mode = 2
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
@@ -40,6 +54,7 @@ text = "  底池: $0"
 theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
 
 [node name="CommunityCards" type="HBoxContainer" parent="."]
+layout_mode = 2
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -119,6 +134,7 @@ vertical_alignment = 1
 theme_override_font_sizes/font_size = 32
 
 [node name="PlayerHand" type="HBoxContainer" parent="."]
+layout_mode = 2
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
@@ -156,6 +172,7 @@ vertical_alignment = 1
 theme_override_font_sizes/font_size = 36
 
 [node name="ActionPanel" type="VBoxContainer" parent="."]
+layout_mode = 2
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
@@ -192,6 +209,7 @@ text = "开始新局"
 theme_override_colors/font_color = Color(0.3, 1, 0.3, 1)
 
 [node name="ResultLabel" type="Label" parent="."]
+layout_mode = 2
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
