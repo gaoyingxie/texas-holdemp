@@ -64,11 +64,11 @@ func _update_community_cards() -> void:
             var c = cards[i]
             var info = _card_text(c)
             label.text = info.text
-            label.set("theme_override_colors/font_color", info.color)
+            label.modulate = info.color
             _style_card(card_node, c)
         else:
             label.text = "?"
-            label.set("theme_override_colors/font_color", Color(0.5, 0.5, 0.5, 1))
+            label.modulate = Color(0.5, 0.5, 0.5, 1)
             card_node.remove_theme_color_override("background_color")
             var style = StyleBoxFlat.new()
             style.bg_color = Color(0.2, 0.25, 0.2, 0.8)
@@ -98,11 +98,66 @@ func _update_player_hand() -> void:
             var c = cards[i]
             var info = _card_text(c)
             label.text = info.text
-            label.set("theme_override_colors/font_color", info.color)
+            label.modulate = info.color
             _style_card(card_node, c)
         else:
             label.text = "?"
-            label.set("theme_override_colors/font_color", Color(0.5, 0.5, 0.5, 1))
+            label.modulate = Color(0.5, 0.5, 0.5, 1)
+
+
+func _update_ai_hands() -> void:
+    # 非结算时AI牌盖住，结算时全亮
+    var reveal = is_game_over
+    # Update AI-1 hand display
+    var ai1_hand_nodes = $AI1Hand.get_children()
+    for i in range(2):
+        var card_node = ai1_hand_nodes[i]
+        var label = card_node.get_node("Label")
+        if reveal and i < ai1.hand.size():
+            var c = ai1.hand[i]
+            var info = _card_text(c)
+            label.text = info.text
+            label.modulate = info.color
+            _style_card(card_node, c)
+        else:
+            label.text = "?"
+            label.modulate = Color(0.5, 0.5, 0.5, 1)
+
+    # Update AI-2 hand display
+    var ai2_hand_nodes = $AI2Hand.get_children()
+    for i in range(2):
+        var card_node = ai2_hand_nodes[i]
+        var label = card_node.get_node("Label")
+        if reveal and i < ai2.hand.size():
+            var c = ai2.hand[i]
+            var info = _card_text(c)
+            label.text = info.text
+            label.modulate = info.color
+            _style_card(card_node, c)
+        else:
+            label.text = "?"
+            label.modulate = Color(0.5, 0.5, 0.5, 1)
+
+
+func _show_all_hands() -> void:
+    # Show all players' cards during showdown
+    _update_ai_hands()
+    # 结果标签显示各玩家手牌
+    var result_lines = []
+    for p in [player, ai1, ai2]:
+        if p.is_folded:
+            result_lines.append(p.name + ": 弃牌")
+        else:
+            var hand_str = ""
+            for c in p.hand:
+                var info = _card_text(c)
+                hand_str += info.text + " "
+            result_lines.append(p.name + ": " + hand_str)
+    var community_str = "公共: "
+    for c in game.community:
+        var info = _card_text(c)
+        community_str += info.text + " "
+    $ResultLabel.text = "\n".join(result_lines) + "\n" + community_str
 
 
 func _update_ui() -> void:
@@ -121,6 +176,9 @@ func _update_ui() -> void:
 
     # 玩家手牌
     _update_player_hand()
+
+    # AI手牌（结算前隐藏）
+    _update_ai_hands()
 
     # 按钮状态
     var is_my_turn = not player.is_folded and not is_game_over
@@ -250,6 +308,7 @@ func _show_result() -> void:
         $ResultLabel.text = game.winner_name + " 获胜！ +$%d" % game.pot
     $ResultLabel.visible = true
     $ActionPanel/NextHandBtn.disabled = false
+    _show_all_hands()
     _update_ui()
 
 
