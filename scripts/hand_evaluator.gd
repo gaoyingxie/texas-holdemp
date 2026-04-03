@@ -64,9 +64,8 @@ func best_five(cards) -> Variant:
 
 ## 比较两手牌，返回 1=hand1赢，-1=hand2赢，0=平局
 func compare(hand1: Array, hand2: Array) -> int:
-    var s1: Array = evaluate(hand1)
-    var s2: Array = evaluate(hand2)
-    return _cmp(s1, s2)
+    # hand1 and hand2 are ALREADY evaluated results [rank, kickers]
+    return _cmp(hand1, hand2)
 
 
 func _best_five(cards) -> Variant:
