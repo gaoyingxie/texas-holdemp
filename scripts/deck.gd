@@ -9,28 +9,28 @@ var _cards = []
 
 
 func _init():
-    for suit in range(4):
-        for rank in range(2, 15):
-            _cards.append(_CardRef.new(suit, rank))
+	for suit in range(4):
+		for rank in range(2, 15):
+			_cards.append(_CardRef.new(suit, rank))
 
 
 func shuffle() -> void:
-    var rng = RandomNumberGenerator.new()
-    for i in range(_cards.size()):
-        var j = rng.randi_range(i, _cards.size() - 1)
-        var tmp = _cards[i]
-        _cards[i] = _cards[j]
-        _cards[j] = tmp
+	var rng = RandomNumberGenerator.new()
+	for i in range(_cards.size()):
+		var j = rng.randi_range(i, _cards.size() - 1)
+		var tmp = _cards[i]
+		_cards[i] = _cards[j]
+		_cards[j] = tmp
 
 
 func deal(count: int) -> Variant:
-    var hand = []
-    for i in range(count):
-        if _cards.is_empty():
-            break
-        hand.append(_cards.pop_back())
-    return hand
+	var hand = []
+	for i in range(count):
+		if _cards.is_empty():
+			break
+		hand.append(_cards.pop_back())
+	return hand
 
 
 func remaining() -> int:
-    return _cards.size()
+	return _cards.size()

@@ -27,128 +27,128 @@ var winner_name: String = ""
 var bb_amount: int = 20
 
 func _init():
-    deck = _DeckRef.new()
-    evaluator = _HE.new()
+	deck = _DeckRef.new()
+	evaluator = _HE.new()
 
 
 func add_player(name: String, chips: int) -> Variant:
-    var p = _PlayerRef.new(name, chips)
-    players.append(p)
-    return p
+	var p = _PlayerRef.new(name, chips)
+	players.append(p)
+	return p
 
 
 func start_new_hand():
-    deck = _DeckRef.new()
-    deck.shuffle()
-    community.clear()
-    pot = 0
-    current_bet = 0
-    stage = GameStage.PREFLOP
-    game_over = false
-    winner_name = ""
-    for p in players:
-        p.reset()
-    dealer_idx = (dealer_idx + 1) % players.size()
-    deal_hole_cards()
+	deck = _DeckRef.new()
+	deck.shuffle()
+	community.clear()
+	pot = 0
+	current_bet = 0
+	stage = GameStage.PREFLOP
+	game_over = false
+	winner_name = ""
+	for p in players:
+		p.reset()
+	dealer_idx = (dealer_idx + 1) % players.size()
+	deal_hole_cards()
 
 
 func deal_hole_cards():
-    for p in players:
-        p.hand = deck.deal(2)
+	for p in players:
+		p.hand = deck.deal(2)
 
 
 func deal_community(count: int):
-    for i in range(count):
-        if deck.remaining() > 0:
-            community.append(deck.deal(1)[0])
+	for i in range(count):
+		if deck.remaining() > 0:
+			community.append(deck.deal(1)[0])
 
 
 func next_stage():
-    reset_bet()
-    match stage:
-        GameStage.PREFLOP: stage = GameStage.FLOP; deal_community(3)
-        GameStage.FLOP:    stage = GameStage.TURN; deal_community(1)
-        GameStage.TURN:    stage = GameStage.RIVER; deal_community(1)
-        GameStage.RIVER:   stage = GameStage.SHOWDOWN
+	reset_bet()
+	match stage:
+		GameStage.PREFLOP: stage = GameStage.FLOP; deal_community(3)
+		GameStage.FLOP:    stage = GameStage.TURN; deal_community(1)
+		GameStage.TURN:    stage = GameStage.RIVER; deal_community(1)
+		GameStage.RIVER:   stage = GameStage.SHOWDOWN
 
 
 func active_players() -> Variant:
-    var active = []
-    for p in players:
-        if not p.is_folded:
-            active.append(p)
-    return active
+	var active = []
+	for p in players:
+		if not p.is_folded:
+			active.append(p)
+	return active
 
 
 func folded_players() -> Variant:
-    var folded = []
-    for p in players:
-        if p.is_folded:
-            folded.append(p)
-    return folded
+	var folded = []
+	for p in players:
+		if p.is_folded:
+			folded.append(p)
+	return folded
 
 
 func do_fold(pl):
-    pl.is_folded = true
+	pl.is_folded = true
 
 
 func do_call(pl) -> int:
-    var amount = pl.bet(current_bet)
-    pot += amount
-    return amount
+	var amount = pl.bet(current_bet)
+	pot += amount
+	return amount
 
 
 func do_raise(pl, total: int) -> int:
-    current_bet = total
-    var amount = pl.bet(total)
-    pot += amount
-    return amount
+	current_bet = total
+	var amount = pl.bet(total)
+	pot += amount
+	return amount
 
 
 func do_all_in(pl) -> int:
-    var amount = pl.bet(pl.chips)
-    if amount > current_bet:
-        current_bet = amount
-    pot += amount
-    return amount
+	var amount = pl.bet(pl.chips)
+	if amount > current_bet:
+		current_bet = amount
+	pot += amount
+	return amount
 
 
 func do_check(pl) -> int:
-    return 0
+	return 0
 
 
 func reset_bet():
-    current_bet = 0
+	current_bet = 0
 
 
 func award_pot(winner):
-    winner.chips += pot
-    pot = 0
+	winner.chips += pot
+	pot = 0
 
 
 func best_hand_of(pl) -> Array:
-    return evaluator.evaluate(pl.hand + community)
+	return evaluator.evaluate(pl.hand + community)
 
 
 func determine_winner() -> Variant:
-    var active = active_players()
-    if active.is_empty():
-        return null
-    if active.size() == 1:
-        return active[0]
-    var best: Array = best_hand_of(active[0])
-    var winner = active[0]
-    for i in range(1, active.size()):
-        var sc: Array = best_hand_of(active[i])
-        if evaluator.compare(sc, best) > 0:
-            best = sc
-            winner = active[i]
-    return winner
+	var active = active_players()
+	if active.is_empty():
+		return null
+	if active.size() == 1:
+		return active[0]
+	var best: Array = best_hand_of(active[0])
+	var winner = active[0]
+	for i in range(1, active.size()):
+		var sc: Array = best_hand_of(active[i])
+		if evaluator.compare(sc, best) > 0:
+			best = sc
+			winner = active[i]
+	return winner
 
 
 func resolve_showdown():
-    var w = determine_winner()
-    if w != null:
-        award_pot(w)
-        winner_name = w.name
-    game_over = true
+	var w = determine_winner()
+	if w != null:
+		award_pot(w)
+		winner_name = w.name
+	game_over = true
