@@ -17,6 +17,7 @@ var player
 var ai1
 var ai2
 var is_game_over: bool = false
+var show_ai_hands: bool = false
 
 
 func _ready() -> void:
@@ -39,6 +40,7 @@ func _setup_game() -> void:
     ai2 = game.add_player("AI-2", 1000)
     game.start_new_hand()
     is_game_over = false
+    show_ai_hands = false
     $ResultLabel.visible = false
     $ActionPanel/NextHandBtn.disabled = true
     _update_ui()
@@ -106,8 +108,8 @@ func _update_player_hand() -> void:
 
 
 func _update_ai_hands() -> void:
-    # 非结算时AI牌盖住，结算时全亮
-    var reveal = is_game_over
+    # 非结算时AI牌盖住，结算或ALL IN后全亮
+    var reveal = is_game_over or show_ai_hands
     # Update AI-1 hand display
     var ai1_hand_nodes = $AI1Hand.get_children()
     for i in range(2):
@@ -230,6 +232,7 @@ func _on_raise() -> void:
 func _on_all_in() -> void:
     if is_game_over or player.is_folded or player.is_all_in: return
     game.do_all_in(player)
+    show_ai_hands = true
     _ai_turn()
 
 
@@ -239,7 +242,10 @@ func _ai_turn() -> void:
         if p.is_folded or is_game_over: continue
         await get_tree().create_timer(0.6).timeout
         _ai_action(p)
-    _update_ui()
+        _update_ui()
+        # 每步行动后检查是否结束本轮
+        if _should_end_round():
+            break
     _check_round_end()
 
 
@@ -268,9 +274,19 @@ func _check_round_end() -> void:
         return
     if game.stage == _PGR.GameStage.SHOWDOWN:
         return
-    # 检查是否所有人都下了最低跟注额
-    if _all_bet_equal():
+    if _should_end_round():
         _advance_stage()
+
+
+func _should_end_round() -> bool:
+    # ALL IN 或所有活跃玩家都已下注相等（简化：只剩all-in玩家时结束）
+    var active = game.active_players()
+    var has_non_all_in = false
+    for p in active:
+        if not p.is_all_in and not p.is_folded:
+            has_non_all_in = true
+            break
+    return not has_non_all_in  # 没有还需要行动的玩家就结束
 
 
 func _all_bet_equal() -> bool:
@@ -323,6 +339,7 @@ func _on_next_hand() -> void:
         game.players.erase(ai2)
     game.start_new_hand()
     is_game_over = false
+    show_ai_hands = false
     $ResultLabel.visible = false
     $ActionPanel/NextHandBtn.disabled = true
     _update_ui()
