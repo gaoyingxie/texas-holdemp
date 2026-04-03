@@ -180,8 +180,8 @@ func _update_ui() -> void:
     # AI手牌（结算前隐藏）
     _update_ai_hands()
 
-    # 按钮状态
-    var is_my_turn = not player.is_folded and not is_game_over
+    # 按钮状态（ALL IN后无需操作）
+    var is_my_turn = not player.is_folded and not is_game_over and not player.is_all_in
     $ActionPanel/FoldBtn.disabled = not is_my_turn
     $ActionPanel/CheckBtn.disabled = not is_my_turn
     $ActionPanel/CallBtn.disabled = not is_my_turn
@@ -196,19 +196,19 @@ func _update_ui() -> void:
 
 
 func _on_fold() -> void:
-    if is_game_over or player.is_folded: return
+    if is_game_over or player.is_folded or player.is_all_in: return
     game.do_fold(player)
     _ai_turn()
 
 
 func _on_check() -> void:
-    if is_game_over or player.is_folded: return
+    if is_game_over or player.is_folded or player.is_all_in: return
     game.do_check(player)
     _ai_turn()
 
 
 func _on_call() -> void:
-    if is_game_over or player.is_folded: return
+    if is_game_over or player.is_folded or player.is_all_in: return
     if game.current_bet > 0:
         game.do_call(player)
     else:
@@ -217,7 +217,7 @@ func _on_call() -> void:
 
 
 func _on_raise() -> void:
-    if is_game_over or player.is_folded: return
+    if is_game_over or player.is_folded or player.is_all_in: return
     # 简化：加注到 current_bet + 50
     var raise_to = game.current_bet + 50
     if raise_to > player.chips:
@@ -228,7 +228,7 @@ func _on_raise() -> void:
 
 
 func _on_all_in() -> void:
-    if is_game_over or player.is_folded: return
+    if is_game_over or player.is_folded or player.is_all_in: return
     game.do_all_in(player)
     _ai_turn()
 
