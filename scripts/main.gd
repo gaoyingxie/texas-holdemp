@@ -94,7 +94,6 @@ func _style_card(card_node: Panel, card, face_up: bool) -> void:
 	style.corner_radius_bottom_right = 6
 	style.corner_radius_bottom_left = 6
 	card_node.add_theme_stylebox_override("panel", style)
-	card_node.queue_sort()
 
 
 func _update_player_hand() -> void:
