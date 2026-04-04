@@ -10,6 +10,7 @@ var chips: int
 var hand = []
 var is_folded: bool = false
 var is_all_in: bool = false
+var current_bet: int = 0
 
 func _init(n: String, c: int):
 	name = n
@@ -28,3 +29,4 @@ func reset():
 	hand.clear()
 	is_folded = false
 	is_all_in = false
+	current_bet = 0

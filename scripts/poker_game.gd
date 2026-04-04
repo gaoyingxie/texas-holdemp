@@ -93,17 +93,19 @@ func do_fold(pl):
 
 
 func do_call(pl) -> int:
-	var amount = pl.bet(current_bet)
+	var diff = current_bet - pl.current_bet
+	if diff < 0: diff = 0
+	var amount = pl.bet(diff)
+	pl.current_bet += amount
 	pot += amount
 	return amount
 
 
 func do_raise(pl, total: int) -> int:
-	# 先结算该玩家之前下过的注，再下新的 total
-	var prev = pl.current_bet
-	var diff = total - prev
+	var diff = total - pl.current_bet
 	if diff < 0: diff = 0
 	var amount = pl.bet(diff)
+	pl.current_bet = total
 	current_bet = total
 	pot += amount
 	return amount
@@ -111,8 +113,9 @@ func do_raise(pl, total: int) -> int:
 
 func do_all_in(pl) -> int:
 	var amount = pl.bet(pl.chips)
-	if amount > current_bet:
-		current_bet = amount
+	pl.current_bet += amount
+	if pl.current_bet > current_bet:
+		current_bet = pl.current_bet
 	pot += amount
 	return amount
 
@@ -123,6 +126,8 @@ func do_check(pl) -> int:
 
 func reset_bet():
 	current_bet = 0
+	for p in players:
+		p.current_bet = 0
 
 
 func award_pot(winner):
