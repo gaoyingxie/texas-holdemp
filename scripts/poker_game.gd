@@ -99,8 +99,12 @@ func do_call(pl) -> int:
 
 
 func do_raise(pl, total: int) -> int:
+	# 先结算该玩家之前下过的注，再下新的 total
+	var prev = pl.current_bet
+	var diff = total - prev
+	if diff < 0: diff = 0
+	var amount = pl.bet(diff)
 	current_bet = total
-	var amount = pl.bet(total)
 	pot += amount
 	return amount
 

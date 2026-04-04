@@ -82,6 +82,7 @@ func _update_community_cards() -> void:
 
 func _style_card(card_node: Panel, card, face_up: bool) -> void:
 	card_node.custom_minimum_size = Vector2(80, 110)
+	card_node.size = Vector2(80, 110)
 	var style = StyleBoxFlat.new()
 	if face_up:
 		style.bg_color = Color(1, 1, 1, 1)
@@ -93,6 +94,7 @@ func _style_card(card_node: Panel, card, face_up: bool) -> void:
 	style.corner_radius_bottom_right = 6
 	style.corner_radius_bottom_left = 6
 	card_node.add_theme_stylebox_override("panel", style)
+	card_node.queue_sort()
 
 
 func _update_player_hand() -> void:
@@ -161,11 +163,7 @@ func _show_all_hands() -> void:
 				var info = _card_text(c)
 				hand_str += info.text + " "
 			result_lines.append(p.name + ": " + hand_str)
-	var community_str = "公共: "
-	for c in game.community:
-		var info = _card_text(c)
-		community_str += info.text + " "
-	$ResultLabel.text = "\n".join(result_lines) + "\n" + community_str
+	$ResultLabel.text = "\n".join(result_lines)
 
 
 func _update_ui() -> void:
@@ -284,9 +282,23 @@ func _check_round_end() -> void:
 func _all_bet_equal() -> bool:
 	var active = game.active_players()
 	if active.size() <= 1: return true
+	# 检查所有活跃玩家（不含all-in）的 current_bet 是否都等于 game.current_bet
+	# all-in 玩家单独处理：其 current_bet 可能小于 game.current_bet（当跟注额超筹码时）
+	var target = game.current_bet
+	var can_still_bet = []  # 非all-in玩家
+	var all_in_players = []   # all-in玩家
 	for p in active:
-		if p.is_all_in: continue
-		# 简化：检查 current_bet 是否所有人已处理
+		if p.is_all_in:
+			all_in_players.append(p)
+		else:
+			can_still_bet.append(p)
+	# 如果没有还能下注的玩家（即全all-in或只剩一人），本轮结束
+	if can_still_bet.is_empty():
+		return true
+	# 检查还能下注的玩家是否都已跟注
+	for p in can_still_bet:
+		if p.current_bet < target:
+			return false
 	return true
 
 
